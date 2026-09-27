@@ -83,7 +83,7 @@
       /* match the name's width like the boxes do */
       width: 0;
       min-width: 100%;
-      height: 230px;
+      height: 260px;
       margin-top: -2rem;
     }
 
@@ -183,8 +183,13 @@
         { name: 'double', weight: 0.15 },
       ];
       const LAND_TIME = 0.2;     // knees soak up the landing after a flip
+      // He always opens with this routine back to back, then goes random
+      // The triple flip is a bit too ambitious: he over-rotates and crashes on landing
+      const OPENING = ['triple', 'flip', 'flip', 'jump', 'fall'];
+      const OPENING_GAP = 0.35;  // seconds of running between opening tricks
+      let queue = [...OPENING];
       let trickClock = 0;
-      let nextTrick = randomGap();
+      let nextTrick = 0.6;       // first flip comes almost right away
 
       function randomGap() {
         // Every second or two, sometimes a slightly longer clean run
@@ -202,8 +207,8 @@
       // Airborne tricks
       const GRAVITY = 560;       // px/s^2
       // Upward px/s at takeoff: flips need more height, doubles the most
-      const TAKEOFF = { jump: 185, hurdle: 165, flip: 240, double: 262 };
-      const SPINS = { flip: 1, double: 2 };
+      const TAKEOFF = { jump: 185, hurdle: 165, flip: 240, double: 262, triple: 285 };
+      const SPINS = { flip: 1, double: 2, triple: 3 };
       let jumpKind = 'hurdle';
       let airTime = 0.6;
       let feetY = 0;             // height of his feet while airborne
@@ -249,8 +254,8 @@
 
           if (trickClock > nextTrick) {
             trickClock = 0;
-            nextTrick = randomGap();
-            const trick = pickTrick();
+            const trick = queue.length ? queue.shift() : pickTrick();
+            nextTrick = queue.length ? OPENING_GAP : randomGap();
             if (trick === 'fall') {
               go('trip');
             } else {
@@ -268,7 +273,8 @@
           feetY += vy * dt;
           const floor = ground(distance + width * RUNNER_X);
           if (vy > 0 && feetY >= floor) {
-            go(jumpKind === 'hurdle' ? 'running' : 'land');
+            if (jumpKind === 'triple') go('trip');       // bails the landing and falls
+            else go(jumpKind === 'hurdle' ? 'running' : 'land');
           }
         } else if (state === 'land') {
           distance += RUN_SPEED * 0.7 * dt;
