@@ -1,0 +1,44 @@
+/* Slide between pages using cross-document View Transitions.
+   transitions.js picks the direction:
+   (default) moving right  -> slides left
+   back      moving left   -> slides right
+   down      moving down   -> slides up
+   up        moving up     -> slides down */
+@view-transition {
+  navigation: auto;
+}
+
+@keyframes slide-out-left   { to   { transform: translateX(-100%); } }
+@keyframes slide-in-right   { from { transform: translateX(100%); } }
+@keyframes slide-out-right  { to   { transform: translateX(100%); } }
+@keyframes slide-in-left    { from { transform: translateX(-100%); } }
+@keyframes slide-out-top    { to   { transform: translateY(-100%); } }
+@keyframes slide-in-bottom  { from { transform: translateY(100%); } }
+@keyframes slide-out-bottom { to   { transform: translateY(100%); } }
+@keyframes slide-in-top     { from { transform: translateY(-100%); } }
+
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root) {
+    animation: 1000ms cubic-bezier(0.65, 0, 0.35, 1) both slide-out-left;
+  }
+  ::view-transition-new(root) {
+    animation: 1000ms cubic-bezier(0.65, 0, 0.35, 1) both slide-in-right;
+  }
+
+  html:active-view-transition-type(back)::view-transition-old(root) { animation-name: slide-out-right; }
+  html:active-view-transition-type(back)::view-transition-new(root) { animation-name: slide-in-left; }
+
+  html:active-view-transition-type(down)::view-transition-old(root) { animation-name: slide-out-top; }
+  html:active-view-transition-type(down)::view-transition-new(root) { animation-name: slide-in-bottom; }
+
+  html:active-view-transition-type(up)::view-transition-old(root) { animation-name: slide-out-bottom; }
+  html:active-view-transition-type(up)::view-transition-new(root) { animation-name: slide-in-top; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

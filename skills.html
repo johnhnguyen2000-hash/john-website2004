@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Life in My Eyes | John Nguyen</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="transitions.css">
+  <script src="transitions.js"></script>
+  <style>
+    .page.page-wide {
+      max-width: 1200px;
+    }
+
+    /* ---------- The scene: a small cliff drawing, then the view he sees ---------- */
+    .scene {
+      display: grid;
+      /* Cliff drawing takes about a sixth of the width */
+      grid-template-columns: 1.25fr 5fr;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .cliff {
+      display: block;
+      width: 100%;
+      height: 210px;
+    }
+
+    /* What he sees: photos floating around, all facing us */
+    .view {
+      position: relative;
+      height: clamp(420px, 64vh, 640px);
+    }
+
+    .view button {
+      position: absolute;
+      left: var(--x);
+      top: var(--y);
+      width: var(--w);
+      height: var(--h);
+      padding: 0;
+      border: 0;
+      background: none;
+      cursor: zoom-in;
+      opacity: 0;
+      scale: 0.92;
+      transition: opacity 0.9s ease, scale 0.9s ease;
+      transition-delay: calc(var(--i) * 0.15s);
+    }
+
+    .view.revealed button {
+      opacity: 1;
+      scale: 1;
+    }
+
+    /* A photo on its way out before a new one takes its spot */
+    .view.revealed button.swapping {
+      opacity: 0;
+      scale: 0.94;
+      transition-delay: 0s;
+    }
+
+    /* Each photo bobs gently on its own rhythm */
+    .floater {
+      display: block;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.18);
+      animation: float var(--dur) ease-in-out infinite alternate;
+      animation-delay: calc(var(--i) * -1.3s);
+      transition: box-shadow 0.3s ease;
+    }
+
+    .view button:hover .floater,
+    .view button:focus-visible .floater {
+      animation-play-state: paused;
+      box-shadow: 0 22px 44px rgba(0, 0, 0, 0.28);
+    }
+
+    @keyframes float {
+      0%   { transform: translate(0, 0); }
+      50%  { transform: translate(var(--dx), -10px); }
+      100% { transform: translate(calc(var(--dx) * -0.5), 6px); }
+    }
+
+    .view img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .view button:hover img,
+    .view button:focus-visible img {
+      transform: scale(1.05);
+    }
+
+
+    /* ---------- Full-screen photo ---------- */
+    .viewer {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      display: none;
+      background: #000;
+      color: #fff;
+    }
+
+    .viewer.open {
+      display: block;
+      animation: take-over 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    @keyframes take-over {
+      from { opacity: 0; transform: scale(0.6); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    .frame {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    .frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: opacity 0.35s ease;
+      /* Slow pan across the photo while it's open */
+      animation: pan 14s ease-in-out infinite alternate;
+    }
+
+    .frame.switching img {
+      opacity: 0;
+    }
+
+    @keyframes pan {
+      from { transform: scale(1.12) translate(-3%, -2%); }
+      to   { transform: scale(1.12) translate(3%, 2%); }
+    }
+
+    .nav-btn,
+    .close-btn {
+      position: absolute;
+      display: grid;
+      place-items: center;
+      border: 1.5px solid rgba(255, 255, 255, 0.6);
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.35);
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .nav-btn:hover,
+    .close-btn:hover {
+      background: rgba(0, 0, 0, 0.6);
+      border-color: #fff;
+    }
+
+    .nav-btn {
+      top: 50%;
+      width: 54px;
+      height: 54px;
+      margin-top: -27px;
+      font-size: 1.375rem;
+    }
+
+    .nav-prev { left: 2vw; }
+    .nav-next { right: 2vw; }
+
+    .close-btn {
+      top: 1.25rem;
+      right: 1.25rem;
+      width: 44px;
+      height: 44px;
+      font-size: 1.25rem;
+    }
+
+    .count {
+      position: absolute;
+      bottom: 1.25rem;
+      left: 50%;
+      translate: -50% 0;
+      padding: 0.25rem 0.75rem;
+      font-size: 0.875rem;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 999px;
+    }
+
+    @media (max-width: 700px) {
+      .scene {
+        grid-template-columns: 1fr;
+      }
+      .cliff {
+        height: 140px;
+      }
+      .view {
+        height: 520px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .frame img, .floater { animation: none; }
+      .viewer.open { animation: none; }
+      .view button { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page page-wide">
+    <a class="back" href="about.html" aria-label="Back to About Me">&larr;</a>
+    <h1>Life in My Eyes</h1>
+
+    <div class="scene">
+      <canvas class="cliff" aria-hidden="true"></canvas>
+      <div class="view" aria-label="Photos"></div>
+    </div>
+  </main>
+
+  <div class="viewer" role="dialog" aria-modal="true" aria-label="Photo">
+    <div class="frame"><img alt=""></div>
+    <button class="nav-btn nav-prev" type="button" aria-label="Previous photo">&larr;</button>
+    <button class="nav-btn nav-next" type="button" aria-label="Next photo">&rarr;</button>
+    <button class="close-btn" type="button" aria-label="Close">&times;</button>
+    <p class="count" aria-live="polite"></p>
+  </div>
+
+  <script>
+    // To add a photo: put it in the images folder and add it to this list
+    const PHOTOS = [
+      { src: 'images/cliffs.jpeg', alt: 'Looking down chalk cliffs to waves rolling onto a rocky beach' },
+      { src: 'images/boxing.jpeg', alt: 'John in headgear in the corner of a boxing ring before a bout' },
+      { src: 'images/djing.jpeg', alt: 'John DJing on Pioneer decks at a pop-up event', position: '75% 55%' },
+      { src: 'images/rooftop-red.jpg', alt: 'Rooftop bar at night with red-lit speaker towers and haze', position: 'center 62%' },
+      { src: 'images/concert-blue.jpeg', alt: 'DJs performing on a blue-lit stage with a glowing projected figure behind them', position: 'center 45%' },
+      { src: 'images/food.jpeg', alt: 'Korean beef tartare topped with shredded cheese and an egg yolk', position: 'center 55%' },
+      { src: 'images/scarecrow.jpg', alt: 'Two friends making claw hands next to a scarecrow on an autumn day', position: 'center 40%' },
+      { src: 'images/candlelit-drinks.jpg', alt: 'Cocktails around a candle on a dark table' },
+      { src: 'images/cafe.jpg', alt: 'People sitting in a warm, dimly lit cafe with tiled walls and plants', position: 'center 60%' },
+    ];
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // ---------- Floating photos ----------
+    // Four spots on screen (percent of the area), sized so none overlap.
+    // Photos take turns: every few seconds two fade out and different ones fade in.
+    const SPOTS = [
+      { x: 3,  y: 4,  w: 31, h: 52, dx: 6,  dur: 14 },
+      { x: 39, y: 10, w: 27, h: 42, dx: -5, dur: 16 },
+      { x: 70, y: 28, w: 28, h: 54, dx: 4,  dur: 13 },
+      { x: 22, y: 60, w: 31, h: 38, dx: -4, dur: 15 },
+    ];
+    const SWAP_EVERY = 3000;   // ms between swaps: a photo changes every 3 seconds
+    const FADE_MS = 900;
+
+    const view = document.querySelector('.view');
+    const slots = SPOTS.map((spot, i) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.style.setProperty('--i', i);
+      btn.style.setProperty('--x', `${spot.x}%`);
+      btn.style.setProperty('--y', `${spot.y}%`);
+      btn.style.setProperty('--w', `${spot.w}%`);
+      btn.style.setProperty('--h', `${spot.h}%`);
+      btn.style.setProperty('--dx', `${spot.dx}px`);
+      btn.style.setProperty('--dur', `${spot.dur}s`);
+      const floater = document.createElement('span');
+      floater.className = 'floater';
+      const img = document.createElement('img');
+      img.alt = '';
+      floater.appendChild(img);
+      btn.appendChild(floater);
+      view.appendChild(btn);
+      const slot = { btn, img, photo: -1 };
+      btn.addEventListener('click', () => openViewer(slot.photo));
+      return slot;
+    });
+
+    function fill(slot, photoIndex) {
+      const p = PHOTOS[photoIndex];
+      slot.photo = photoIndex;
+      slot.img.src = p.src;
+      slot.img.style.objectPosition = p.position || 'center';
+      slot.btn.setAttribute('aria-label', `Open photo: ${p.alt}`);
+    }
+
+    // Start with the first four photos
+    slots.forEach((slot, i) => fill(slot, i % PHOTOS.length));
+
+    const SWAP_COUNT = 2;      // how many photos change at once
+
+    // Pick n random items from a list without repeats
+    function pickSome(list, n) {
+      const copy = [...list];
+      const out = [];
+      while (out.length < n && copy.length) {
+        out.push(copy.splice(Math.floor(Math.random() * copy.length), 1)[0]);
+      }
+      return out;
+    }
+
+    function swapSome() {
+      const showing = new Set(slots.map((s) => s.photo));
+      const hidden = PHOTOS.map((_, i) => i).filter((i) => !showing.has(i));
+      const incoming = pickSome(hidden, SWAP_COUNT);
+      const leaving = pickSome(slots, incoming.length);
+      leaving.forEach((slot, n) => {
+        slot.btn.classList.add('swapping');
+        setTimeout(() => {
+          fill(slot, incoming[n]);
+          slot.btn.classList.remove('swapping');
+        }, FADE_MS);
+      });
+    }
+
+    if (!reduceMotion && PHOTOS.length > SPOTS.length) {
+      // Wait until the photos have appeared before starting to swap them
+      setTimeout(() => setInterval(swapSome, SWAP_EVERY), 5000);
+    }
+
+    // ---------- Runner coming to a stop at the cliff edge ----------
+    (() => {
+      const canvas = document.querySelector('.cliff');
+      const ctx = canvas.getContext('2d');
+      const INK = '#1a1a1a';
+      const GREEN = '#1e4d2b';
+      const RUN_SPEED = 90;      // px per second at full pace
+      const STRIDE_LENGTH = 40;
+      const SCALE = 1.25;
+
+      let width = 0;
+      let height = 0;
+      let x = 0;                 // runner position
+      let speed = RUN_SPEED;
+      let stride = 0;
+      let stoppedFor = -1;       // seconds since he stopped (-1 = still running)
+      let revealed = false;
+
+      // Flat clifftop that ends in an overhanging lip
+      const groundY = () => height * 0.42;
+      const edgeX = () => width * 0.82;
+      const stopX = () => edgeX() - 12;
+
+      function resize() {
+        const dpr = window.devicePixelRatio || 1;
+        width = canvas.clientWidth;
+        height = canvas.clientHeight;
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        draw();
+      }
+
+      function drawCliff() {
+        const gy = groundY();
+        const ex = edgeX();
+        ctx.beginPath();
+        // Flat clifftop
+        ctx.moveTo(0, gy);
+        ctx.lineTo(ex, gy);
+        // Rounded lip that juts out, a smooth undercut beneath it, then a clean drop
+        ctx.quadraticCurveTo(ex + 8, gy, ex + 6, gy + 6);
+        ctx.quadraticCurveTo(ex - 2, gy + 18, ex - 14, gy + 26);
+        ctx.quadraticCurveTo(ex - 20, gy + 32, ex - 18, gy + 48);
+        ctx.lineTo(ex - 22, height);
+        ctx.strokeStyle = GREEN;
+        ctx.lineWidth = 2.5;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.stroke();
+      }
+
+      function limb(x1, y1, len, angle) {
+        const x2 = x1 + Math.sin(angle) * len;
+        const y2 = y1 + Math.cos(angle) * len;
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        return [x2, y2];
+      }
+
+      function drawFigure(px, py, pose) {
+        ctx.save();
+        ctx.translate(px, py + pose.lift);
+        ctx.scale(SCALE, SCALE);
+        ctx.rotate(pose.lean);
+        ctx.strokeStyle = INK;
+        ctx.fillStyle = INK;
+        ctx.lineWidth = 2.2;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        const hipY = -14;
+        const shoulderY = -27;
+        let [kx, ky] = limb(0, hipY, 7.5, pose.legs[0]);
+        limb(kx, ky, 7.5, pose.legs[1]);
+        [kx, ky] = limb(0, hipY, 7.5, pose.legs[2]);
+        limb(kx, ky, 7.5, pose.legs[3]);
+        ctx.moveTo(0, hipY);
+        ctx.lineTo(0, shoulderY);
+        let [ex, ey] = limb(0, shoulderY + 1.5, 6, pose.arms[0]);
+        limb(ex, ey, 6, pose.arms[1]);
+        [ex, ey] = limb(0, shoulderY + 1.5, 6, pose.arms[2]);
+        limb(ex, ey, 6, pose.arms[3]);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(0.5, shoulderY - 5, 4.2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // Same running form as the homepage, scaled by how fast he's going
+      function runPose(effort) {
+        const legs = [];
+        const arms = [];
+        [0, Math.PI].forEach((o) => {
+          const s = Math.sin(stride + o);
+          const thigh = 0.65 * s * effort;
+          const knee = (0.2 + 1.2 * Math.max(0, -Math.sin(stride + o + 0.7))) * effort;
+          legs.push(thigh, thigh - knee);
+          const upper = -0.85 * s * effort;
+          arms.push(upper, upper + 0.2 + 1.25 * effort + 0.25 * s * effort);
+        });
+        return { lean: 0.22 * effort, lift: -Math.abs(Math.cos(stride)) * 1.8 * effort, legs, arms };
+      }
+
+      // Stopped at the edge: standing tall, one hand up shading his eyes
+      function lookPose(k) {
+        const lerp = (a, b) => a + (b - a) * k;
+        const base = runPose(0);
+        return {
+          lean: lerp(0.04, -0.02),
+          lift: 0,
+          legs: [lerp(base.legs[0], 0.12), lerp(base.legs[1], 0.08), lerp(base.legs[2], -0.12), lerp(base.legs[3], -0.1)],
+          arms: [lerp(0.2, 2.5), lerp(1.3, 4.1), lerp(-0.1, -0.15), lerp(0.3, 0.05)],
+        };
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, width, height);
+        drawCliff();
+        const effort = speed / RUN_SPEED;
+        const pose = stoppedFor < 0 ? runPose(effort) : lookPose(Math.min(1, stoppedFor / 0.7));
+        drawFigure(x, groundY(), pose);
+      }
+
+      function reveal() {
+        revealed = true;
+        view.classList.add('revealed');
+      }
+
+      let last = 0;
+      function loop(now) {
+        const dt = last ? Math.min(0.05, (now - last) / 1000) : 0;
+        last = now;
+
+        if (stoppedFor < 0) {
+          // Full pace, then ease off over the last stretch before the edge
+          const remaining = stopX() - x;
+          const brake = Math.min(1, remaining / 60);
+          speed = Math.max(0, RUN_SPEED * Math.sqrt(Math.max(0, brake)));
+          const moved = Math.max(6 * dt, speed * dt);
+          x = Math.min(stopX(), x + moved);
+          stride += (moved / STRIDE_LENGTH) * Math.PI * 2;
+          if (x >= stopX()) { stoppedFor = 0; speed = 0; }
+        } else {
+          stoppedFor += dt;
+          if (stoppedFor > 0.6 && !revealed) reveal();
+        }
+
+        draw();
+        if (stoppedFor < 1) requestAnimationFrame(loop);
+      }
+
+      function start() {
+        x = width * 0.04;
+        speed = RUN_SPEED;
+        stride = 0;
+        stoppedFor = -1;
+        last = 0;
+        requestAnimationFrame(loop);
+      }
+
+      new ResizeObserver(resize).observe(canvas);
+      resize();
+
+      if (reduceMotion) {
+        x = stopX();
+        stoppedFor = 1;
+        speed = 0;
+        draw();
+        reveal();
+      } else {
+        start();
+      }
+    })();
+
+    // ---------- Full-screen viewer ----------
+    const viewer = document.querySelector('.viewer');
+    const frame = viewer.querySelector('.frame');
+    const frameImg = frame.querySelector('img');
+    const count = viewer.querySelector('.count');
+    let current = 0;
+    let opener = null;
+
+    function show(i) {
+      current = (i + PHOTOS.length) % PHOTOS.length;
+      const p = PHOTOS[current];
+      frameImg.src = p.src;
+      frameImg.alt = p.alt;
+      frameImg.style.objectPosition = p.position || 'center';
+      count.textContent = `${current + 1} / ${PHOTOS.length}`;
+    }
+
+    function openViewer(i) {
+      opener = document.activeElement;
+      show(i);
+      viewer.classList.add('open');
+      document.documentElement.style.overflow = 'hidden';
+      viewer.querySelector('.nav-next').focus();
+    }
+
+    function closeViewer() {
+      viewer.classList.remove('open');
+      document.documentElement.style.overflow = '';
+      if (opener) opener.focus();
+    }
+
+    function step(dir) {
+      frame.classList.add('switching');
+      setTimeout(() => {
+        show(current + dir);
+        frame.classList.remove('switching');
+      }, reduceMotion ? 0 : 300);
+    }
+
+    viewer.querySelector('.nav-prev').addEventListener('click', () => step(-1));
+    viewer.querySelector('.nav-next').addEventListener('click', () => step(1));
+    viewer.querySelector('.close-btn').addEventListener('click', closeViewer);
+
+    document.addEventListener('keydown', (e) => {
+      if (!viewer.classList.contains('open')) return;
+      if (e.key === 'ArrowLeft') step(-1);
+      else if (e.key === 'ArrowRight') step(1);
+      else if (e.key === 'Escape') closeViewer();
+      else return;
+      e.preventDefault();
+    });
+
+    // Coming back via the browser's back button restores the page as it was
+    window.addEventListener('pageshow', () => {
+      viewer.classList.remove('open');
+      document.documentElement.style.overflow = '';
+    });
+  </script>
+</body>
+</html>

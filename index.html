@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>John Nguyen</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="transitions.css">
+  <script src="transitions.js"></script>
+  <style>
+    .hero {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .hero-left {
+      position: relative;
+      overflow: hidden;
+      flex: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 4rem;
+    }
+
+
+    .intro {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 3rem;
+      width: fit-content;
+      max-width: 100%;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      margin-top: 1.5rem;
+      /* match the name's width instead of stretching to fit the card text */
+      width: 0;
+      min-width: 100%;
+    }
+
+    .card {
+      padding: 0.875rem;
+      background: #1e4d2b;
+      color: #fff;
+      text-align: left;
+    }
+
+    .card-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      opacity: 0.7;
+      margin-bottom: 0.5rem;
+    }
+
+    .card-text {
+      font-size: 1rem;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    .location {
+      /* sit just under the boxes rather than a full .intro gap away */
+      margin-top: -1.25rem;
+      font-size: 1.75rem;
+      font-style: italic;
+      text-align: left;
+      color: #555;
+    }
+
+    /* Little runner crossing the mountains, under the location line */
+    #runner {
+      display: block;
+      /* match the name's width like the boxes do */
+      width: 0;
+      min-width: 100%;
+      height: 230px;
+      margin-top: -2rem;
+    }
+
+    .hero-left h1 {
+      font-size: clamp(3.5rem, 9vw, 10rem);
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-left h1 .dot {
+      color: #1e4d2b;
+    }
+
+    .hero-right {
+      border-left: 1px solid #e5e5e5;
+    }
+
+    @media (max-width: 700px) {
+      .hero { flex-direction: column; }
+      .hero-left { padding: 2rem; }
+      .cards { grid-template-columns: 1fr; }
+      .hero-right { border-left: none; border-top: 1px solid #e5e5e5; }
+    }
+  </style>
+</head>
+<body>
+  <main class="hero">
+    <section class="hero-left">
+      <div class="intro">
+        <h1>John Nguyen<span class="dot">.</span></h1>
+        <div class="cards">
+          <div class="card">
+            <p class="card-label">Education</p>
+            <p class="card-text">Biology @ Northeastern University &rsquo;27</p>
+          </div>
+          <div class="card">
+            <p class="card-label">Recently</p>
+            <p class="card-text">Research @ Mayo Clinic School of Medicine</p>
+          </div>
+          <div class="card">
+            <p class="card-label">Now</p>
+            <p class="card-text">Founder @ Skinapse AI Lab</p>
+          </div>
+        </div>
+        <p class="location">Boston, MA</p>
+        <canvas id="runner" aria-hidden="true"></canvas>
+      </div>
+    </section>
+    <section class="panel hero-right">
+      <a class="button button-nav" href="about.html">About Me &rarr;</a>
+      <a class="button button-outline" href="https://www.linkedin.com/in/johnhungnguyen" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg>
+        LinkedIn
+      </a>
+      <a class="button button-outline" href="mailto:johnhnguyen2000@gmail.com">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5zm2.4 0L12 10.7 19.6 5H4.4zM20 6.9l-7.4 5.5a1 1 0 0 1-1.2 0L4 6.9V19h16V6.9z"/></svg>
+        Contact
+      </a>
+    </section>
+  </main>
+
+  <script>
+    // A stick figure runs right over endless mountains, trips, falls, and gets back up
+    (() => {
+      const canvas = document.getElementById('runner');
+      const ctx = canvas.getContext('2d');
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      const ZOOM = 1.5;          // draw the scene larger, like a closer camera
+      const RUN_SPEED = 120;     // px per second across the ground (before zoom)
+      const STRIDE_LENGTH = 64;  // ground covered per full leg cycle, so steps match speed
+      const RUNNER_X = 0.28;     // where the figure stays on screen (fraction of width)
+      const INK = '#1a1a1a';
+
+      // How long each part of a fall lasts (seconds)
+      const PHASES = { trip: 0.22, fall: 0.38, impact: 0.18, pushup: 0.5, spring: 0.42 };
+
+      let width = 0;
+      let height = 0;
+      let distance = 0;          // how far the world has scrolled
+      let stride = 0;            // leg cycle phase (radians)
+      // running, jump (jump / hurdle / flip / double), land,
+      // or a fall: trip -> fall -> impact -> down -> pushup -> spring
+      let state = 'running';
+      let stateTime = 0;
+      let downFor = 1;
+      let boost = 0;             // extra speed right after getting back up
+
+      // Tricks happen at random times. Falls are still the single most common,
+      // but flips make up about 40% of everything he does.
+      const TRICKS = [
+        { name: 'fall',   weight: 0.3 },
+        { name: 'flip',   weight: 0.25 },
+        { name: 'jump',   weight: 0.15 },
+        { name: 'hurdle', weight: 0.15 },
+        { name: 'double', weight: 0.15 },
+      ];
+      const LAND_TIME = 0.2;     // knees soak up the landing after a flip
+      let trickClock = 0;
+      let nextTrick = randomGap();
+
+      function randomGap() {
+        // Every second or two, sometimes a slightly longer clean run
+        return 1.1 + Math.random() * 2 + (Math.random() < 0.15 ? Math.random() * 3 : 0);
+      }
+
+      function pickTrick() {
+        let r = Math.random();
+        for (const t of TRICKS) {
+          if ((r -= t.weight) < 0) return t.name;
+        }
+        return TRICKS[0].name;
+      }
+
+      // Airborne tricks
+      const GRAVITY = 560;       // px/s^2
+      // Upward px/s at takeoff: flips need more height, doubles the most
+      const TAKEOFF = { jump: 185, hurdle: 165, flip: 240, double: 262 };
+      const SPINS = { flip: 1, double: 2 };
+      let jumpKind = 'hurdle';
+      let airTime = 0.6;
+      let feetY = 0;             // height of his feet while airborne
+      let vy = 0;
+
+      // Rolling mountains: a few sine waves stacked together
+      function ground(x) {
+        return height * 0.8
+          - Math.sin(x * 0.012) * 13
+          - Math.sin(x * 0.031 + 1.7) * 5
+          - Math.max(0, Math.sin(x * 0.006 + 0.4)) * 15;
+      }
+
+      function resize() {
+        const dpr = window.devicePixelRatio || 1;
+        // Work in zoomed-out units so everything is drawn ZOOM times bigger
+        width = canvas.clientWidth / ZOOM;
+        height = canvas.clientHeight / ZOOM;
+        canvas.width = canvas.clientWidth * dpr;
+        canvas.height = canvas.clientHeight * dpr;
+        ctx.setTransform(dpr * ZOOM, 0, 0, dpr * ZOOM, 0, 0);
+        draw();
+      }
+
+      function go(next) {
+        state = next;
+        stateTime = 0;
+      }
+
+      function update(dt) {
+        stateTime += dt;
+        const rx = distance + width * RUNNER_X;
+        const slope = (ground(rx + 2) - ground(rx - 2)) / 4; // negative = uphill
+
+        if (state === 'running') {
+          // A bit slower uphill, a bit faster downhill, and a burst after getting up
+          const speed = RUN_SPEED * (1 + slope * 0.6) * (1 + boost);
+          const moved = Math.max(30, speed) * dt;
+          distance += moved;
+          stride += (moved / STRIDE_LENGTH) * Math.PI * 2;
+          boost = Math.max(0, boost - dt * 0.4);
+          trickClock += dt;
+
+          if (trickClock > nextTrick) {
+            trickClock = 0;
+            nextTrick = randomGap();
+            const trick = pickTrick();
+            if (trick === 'fall') {
+              go('trip');
+            } else {
+              jumpKind = trick;
+              feetY = ground(rx);
+              vy = -TAKEOFF[trick];
+              airTime = (2 * TAKEOFF[trick]) / GRAVITY;
+              go('jump');
+            }
+          }
+        } else if (state === 'jump') {
+          distance += RUN_SPEED * (1 + boost) * dt;
+          stride += dt * 4; // legs keep a little motion in the air
+          vy += GRAVITY * dt;
+          feetY += vy * dt;
+          const floor = ground(distance + width * RUNNER_X);
+          if (vy > 0 && feetY >= floor) {
+            go(jumpKind === 'hurdle' ? 'running' : 'land');
+          }
+        } else if (state === 'land') {
+          distance += RUN_SPEED * 0.7 * dt;
+          stride += dt * 6;
+          if (stateTime > LAND_TIME) go('running');
+        } else if (state === 'trip') {
+          distance += RUN_SPEED * 0.8 * dt;
+          if (stateTime > PHASES.trip) go('fall');
+        } else if (state === 'fall') {
+          // Momentum carries him forward, fading as he hits the ground
+          distance += RUN_SPEED * 0.7 * (1 - stateTime / PHASES.fall) * dt;
+          if (stateTime > PHASES.fall) go('impact');
+        } else if (state === 'impact') {
+          distance += RUN_SPEED * 0.15 * dt; // small skid
+          if (stateTime > PHASES.impact) { downFor = 0.5 + Math.random() * 0.9; go('down'); }
+        } else if (state === 'down') {
+          if (stateTime > downFor) go('pushup');
+        } else if (state === 'pushup') {
+          if (stateTime > PHASES.pushup) go('spring');
+        } else if (state === 'spring') {
+          distance += RUN_SPEED * 0.5 * (stateTime / PHASES.spring) * dt;
+          if (stateTime > PHASES.spring) {
+            boost = 0.35;
+            go('running');
+          }
+        }
+      }
+
+      // Hills are just a dark forest green outline
+      function drawMountains() {
+        ctx.beginPath();
+        for (let x = 0; x <= width; x += 4) {
+          const y = ground(distance + x);
+          if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.strokeStyle = '#1e4d2b';
+        ctx.lineWidth = 2;
+        ctx.lineJoin = 'round';
+        ctx.stroke();
+      }
+
+      function limb(x1, y1, len, angle) {
+        const x2 = x1 + Math.sin(angle) * len;
+        const y2 = y1 + Math.cos(angle) * len;
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        return [x2, y2];
+      }
+
+      // A pose: body rotation (0 = upright, ~1.57 = lying face down), lift off the
+      // ground, and limb angles measured from the body's own "down" (positive = forward).
+      // legs/arms: [front thigh, front shin, back thigh, back shin]
+      const lerp = (a, b, t) => a + (b - a) * t;
+      const ease = (t) => t * t * (3 - 2 * t);
+      function blend(p, q, t) {
+        return {
+          rot: lerp(p.rot, q.rot, t),
+          lift: lerp(p.lift, q.lift, t),
+          legs: p.legs.map((v, i) => lerp(v, q.legs[i], t)),
+          arms: p.arms.map((v, i) => lerp(v, q.arms[i], t)),
+        };
+      }
+
+      function runPose() {
+        const legs = [];
+        const arms = [];
+        [0, Math.PI].forEach((offset) => {
+          const s = Math.sin(stride + offset);
+          const thigh = 0.65 * s;
+          // Knee folds most while the leg swings back through
+          const knee = 0.2 + 1.2 * Math.max(0, -Math.sin(stride + offset + 0.7));
+          legs.push(thigh, thigh - knee);
+          // Arms pump hard against the legs, elbows bent roughly 90 degrees
+          const upper = -0.85 * s;
+          arms.push(upper, upper + 1.45 + 0.25 * s);
+        });
+        // Leans further into the run at speed
+        return { rot: 0.22, lift: -Math.abs(Math.cos(stride)) * 1.8, legs, arms };
+      }
+
+      // Hand-set key poses for the fall and the get-up
+      const POSES = {
+        // Hurdler: lead leg shot out straight, trail leg folded back, opposite arm reaching
+        hurdle:  { rot: 0.38, lift: 0,  legs: [1.45, 1.35, -0.35, -1.9],  arms: [-0.5, 0.5, 1.6, 1.9] },
+        // Front flip: knees pulled to the chest and arms hugging the shins, tucked into a ball
+        ball:    { rot: 0.1,  lift: 0,  legs: [2.3, -0.45, 2.15, -0.55], arms: [1.0, 1.9, 0.9, 1.8] },
+        // Takeoff for a flip: tall, arms thrown up to start the rotation
+        setup:   { rot: 0.05, lift: 0,  legs: [0.15, 0.05, -0.1, -0.2],  arms: [2.8, 3.0, 2.7, 2.9] },
+        // Plain jump: knees drawn up, both arms punched up overhead
+        hop:     { rot: 0.08, lift: 0,  legs: [0.75, -0.35, 0.55, -0.6], arms: [2.5, 2.9, 2.3, 2.7] },
+        // Soft landing: knees bent, arms out front for balance
+        crouch:  { rot: 0.18, lift: 3,  legs: [0.95, -0.6, 0.75, -0.8], arms: [1.4, 2.0, 1.2, 1.8] },
+        stumble: { rot: 0.5,  lift: 0,  legs: [0.55, 0.3, -0.7, -1.3],  arms: [1.1, 1.5, 0.6, 1.0] },
+        diving:  { rot: 1.35, lift: 0,  legs: [0.05, 0, -0.25, -0.35],  arms: [2.3, 2.5, 2.1, 2.4] },
+        landed:  { rot: 1.6,  lift: 0,  legs: [0, -0.1, -0.1, -0.2],    arms: [1.7, 2.9, 1.6, 2.8] },
+        lying:   { rot: 1.57, lift: 0,  legs: [0, -0.05, -0.05, -0.1],  arms: [2.3, 2.9, 2.2, 2.8] },
+        // Arms straight down to the ground, knees tucked under: hands-and-knees
+        pushed:  { rot: 1.0,  lift: 0,  legs: [1.1, -0.45, 1.0, -0.5],  arms: [1.0, 1.0, 1.0, 1.0] },
+        // Driving up off the back foot with arms swinging up for momentum
+        launch:  { rot: 0.2,  lift: -9, legs: [0.7, 0.1, -0.35, -0.7],  arms: [-0.6, 0.6, 1.2, 2.2] },
+      };
+
+      function currentPose() {
+        const t = (d) => Math.min(1, stateTime / d);
+        switch (state) {
+          case 'jump': {
+            const frac = Math.min(1, stateTime / airTime); // 0 = takeoff, 1 = landing
+            const k = Math.sin(frac * Math.PI);
+            if (jumpKind === 'hurdle') return blend(runPose(), POSES.hurdle, Math.min(1, k * 1.5));
+            if (jumpKind === 'jump') return blend(runPose(), POSES.hop, Math.min(1, k * 1.6));
+
+            // Flip: rise with arms up, and only tuck and spin once he's well off the ground.
+            // The spin is finished and he's opened back up before he comes down near the ground.
+            const clamp = (v) => Math.min(1, Math.max(0, v));
+            const tuck = frac < 0.5
+              ? ease(clamp((frac - 0.18) / 0.14))
+              : ease(clamp((0.8 - frac) / 0.12));
+            const reach = ease(clamp(1 - frac / 0.2));
+            const open = blend(runPose(), POSES.setup, Math.max(reach, 1 - tuck) * (frac < 0.5 ? 1 : 0.3));
+            const p = blend(open, POSES.ball, tuck);
+            p.spin = Math.PI * 2 * SPINS[jumpKind] * ease(clamp((frac - 0.2) / 0.58));
+            return p;
+          }
+          case 'land':   return blend(POSES.crouch, runPose(), ease(t(LAND_TIME)));
+          case 'trip':   return blend(runPose(), POSES.stumble, ease(t(PHASES.trip)));
+          // Gravity: rotation speeds up as he goes over
+          case 'fall':   return blend(POSES.stumble, POSES.diving, t(PHASES.fall) ** 2);
+          case 'impact': {
+            const k = t(PHASES.impact);
+            const p = blend(POSES.diving, POSES.landed, ease(Math.min(1, k * 2)));
+            p.lift = -Math.sin(k * Math.PI) * 2.5; // little bounce off the ground
+            return k > 0.5 ? blend(p, POSES.lying, (k - 0.5) * 2) : p;
+          }
+          case 'down': {
+            const p = blend(POSES.lying, POSES.lying, 0);
+            p.rot += Math.sin(stateTime * 5) * 0.01; // catching his breath
+            return p;
+          }
+          case 'pushup': return blend(POSES.lying, POSES.pushed, ease(t(PHASES.pushup)));
+          case 'spring': {
+            const k = t(PHASES.spring);
+            // First half: explode up into the launch; second half: land into the run
+            if (k < 0.55) {
+              const p = blend(POSES.pushed, POSES.launch, ease(k / 0.55));
+              p.lift = -Math.sin((k / 0.55) * Math.PI * 0.5) * 9;
+              return p;
+            }
+            const p = blend(POSES.launch, runPose(), ease((k - 0.55) / 0.45));
+            p.lift = lerp(-9, 0, ((k - 0.55) / 0.45) ** 2);
+            return p;
+          }
+          default:       return runPose();
+        }
+      }
+
+      function drawRunner() {
+        const sx = width * RUNNER_X;
+        const gx = distance + sx;
+        const sy = state === 'jump' ? feetY : ground(gx);
+        const slopeAngle = state === 'jump' ? 0 : Math.atan2(ground(gx + 3) - ground(gx - 3), 6);
+        const pose = currentPose();
+        const upright = Math.max(0, 1 - pose.rot / 1.57);
+
+        ctx.save();
+        ctx.translate(sx, sy + pose.lift);
+        // Lean into hills a little while upright; lie flat along the slope when down
+        ctx.rotate(pose.rot + slopeAngle * (1 - upright) - slopeAngle * 0.3 * upright);
+        // When lying face down, rest on top of the ground instead of sinking into it
+        ctx.translate(-4.5 * (1 - upright), 0);
+        // Flips spin around his middle, not his feet
+        if (pose.spin) {
+          ctx.translate(0, -16);
+          ctx.rotate(pose.spin);
+          ctx.translate(0, 16);
+        }
+
+        ctx.strokeStyle = INK;
+        ctx.fillStyle = INK;
+        ctx.lineWidth = 2.4;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+
+        const hipY = -14;
+        const shoulderY = -27;
+        const [f1, f2, b1, b2] = pose.legs;
+        const [af1, af2, ab1, ab2] = pose.arms;
+
+        // Legs: thigh then shin
+        let [kx, ky] = limb(0, hipY, 7.5, f1);
+        limb(kx, ky, 7.5, f2);
+        [kx, ky] = limb(0, hipY, 7.5, b1);
+        limb(kx, ky, 7.5, b2);
+
+        // Torso
+        ctx.moveTo(0, hipY);
+        ctx.lineTo(0, shoulderY);
+
+        // Arms: upper arm then forearm
+        let [ex, ey] = limb(0, shoulderY + 1.5, 6, af1);
+        limb(ex, ey, 6, af2);
+        [ex, ey] = limb(0, shoulderY + 1.5, 6, ab1);
+        limb(ex, ey, 6, ab2);
+        ctx.stroke();
+
+        // Head
+        ctx.beginPath();
+        ctx.arc(0.5, shoulderY - 5, 4.2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, width, height);
+        drawMountains();
+        drawRunner();
+      }
+
+      let last = performance.now();
+      function loop(now) {
+        const dt = Math.min(0.05, (now - last) / 1000);
+        last = now;
+        update(dt);
+        draw();
+        requestAnimationFrame(loop);
+      }
+
+      new ResizeObserver(resize).observe(canvas);
+      resize();
+      if (!reduceMotion) requestAnimationFrame(loop);
+    })();
+
+  </script>
+</body>
+</html>

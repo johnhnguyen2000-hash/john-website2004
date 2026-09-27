@@ -1,0 +1,313 @@
+/* Shared styles for every page */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  /* Apple's system font (San Francisco), the same look as the "Who am I?" note */
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "Segoe UI", Roboto, sans-serif;
+  color: #111;
+  background: #fafafa;
+}
+
+/* Button panel on the right side of Home */
+.panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 4rem;
+  background: #fafafa;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #fff;
+  background: #1e4d2b;
+  border-radius: 999px;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+}
+
+/* Same width for every button in the stack so they line up */
+.panel .button {
+  width: 15rem;
+  justify-content: center;
+}
+
+.button:hover {
+  background: #163a20;
+  transform: translateX(4px);
+}
+
+/* Darkens when clicked; .is-pressed keeps it dark while the page slides away */
+.button-nav:active,
+.button-nav.is-pressed {
+  background: #0e2715;
+}
+
+.button-outline {
+  color: #1e4d2b;
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px #1e4d2b;
+}
+
+.button-outline:hover {
+  color: #fff;
+  background: #1e4d2b;
+  transform: none;
+}
+
+.button-outline svg {
+  width: 1.1em;
+  height: 1.1em;
+  fill: currentColor;
+}
+
+/* Sub-pages (About, Experiences, Skills) */
+.page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 4rem 2rem;
+  min-height: 100vh;
+}
+
+.back {
+  display: inline-block;
+  margin-bottom: 3rem;
+  font-size: 2rem;
+  line-height: 1;
+  color: #111;
+  text-decoration: none;
+  transition: transform 0.2s;
+}
+
+.back:hover {
+  transform: translateX(-4px);
+}
+
+/* About page spans the full window: bio on the left, portrait centered in
+   the middle, links stacked on the right (every sub-page slides in from there). */
+.about-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 4rem;
+  min-height: 100vh;
+  padding: 5rem 11vw;
+}
+
+.about-grid .page {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: start;
+  max-width: none;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+}
+
+/* Borderless text links for moving between sub-pages */
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111;
+  text-decoration: none;
+  transition: color 0.2s, transform 0.2s;
+}
+
+.nav-link:hover,
+.nav-link:active,
+.nav-link.is-pressed {
+  color: #1e4d2b;
+}
+
+/* "Who am I?" styled like a note in Apple Notes */
+/* No card or border: the note sits right on the page background */
+.page .note h1 {
+  font-size: clamp(2.5rem, 4.5vw, 3.5rem);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  margin-bottom: 1.25rem;
+}
+
+.page .note p {
+  font-size: 1.3125rem;
+  line-height: 1.55;
+  color: #1c1c1e;
+  margin-bottom: 1.1rem;
+}
+
+.page .note p:last-child {
+  margin-bottom: 0;
+}
+
+.page p u {
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}
+
+/* Bio text with the portrait centered in the space beside it */
+.about-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 40rem) minmax(0, 1fr);
+  gap: 3.5rem;
+  align-items: center;
+}
+
+.about-photo {
+  display: block;
+  justify-self: center;
+  width: min(430px, 100%);
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+}
+
+@media (max-width: 900px) {
+  .about-intro {
+    grid-template-columns: 1fr;
+  }
+  .about-photo {
+    max-width: 320px;
+  }
+}
+
+.side-links {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
+  align-self: center;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1.75rem;
+}
+
+.side-links .nav-link:hover {
+  transform: translateX(4px);
+}
+
+@media (max-width: 700px) {
+  .about-grid {
+    grid-template-columns: 1fr;
+    row-gap: 2rem;
+    padding: 4rem 2rem 3rem;
+  }
+  .about-grid .page,
+  .side-links {
+    grid-column: 1;
+    grid-row: auto;
+    justify-self: start;
+    margin: 0;
+  }
+}
+
+.page h1 {
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  margin-bottom: 2rem;
+}
+
+/* Section heading, e.g. "Work Experience" */
+.page h2 {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #1e4d2b;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e5e5e5;
+  margin: 1.75rem 0 1rem;
+}
+
+/* One job, role, or award */
+.entry {
+  margin-bottom: 0.75rem;
+}
+
+.page .entry > :last-child {
+  margin-bottom: 0;
+}
+
+.entry-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.entry h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.entry-place {
+  flex-shrink: 0;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #111;
+}
+
+.page .meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 1rem;
+  font-style: italic;
+  color: #555;
+  margin: 0.125rem 0 0.625rem;
+}
+
+.entry ul {
+  margin-bottom: 0;
+}
+
+.entry li + li {
+  margin-top: 0.375rem;
+}
+
+/* Label/value rows on the Skills page */
+.skill-row {
+  margin-bottom: 1rem;
+}
+
+.skill-row strong {
+  color: #111;
+}
+
+@media (max-width: 700px) {
+  .entry-head,
+  .page .meta {
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
+.page p,
+.page li {
+  font-size: 1.125rem;
+  line-height: 1.7;
+  color: #333;
+}
+
+.page p {
+  margin-bottom: 1.25rem;
+}
+
+.page ul {
+  padding-left: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+@media (max-width: 700px) {
+  .panel { padding: 2rem; }
+}
