@@ -164,14 +164,23 @@ body {
   text-underline-offset: 3px;
 }
 
-/* Portrait in the middle column */
+/* Portrait in the middle column. It stretches to exactly the height of the
+   text block beside it, so text and photo sit as two matching blocks. */
 .about-photo {
   grid-column: 2;
   grid-row: 1;
-  display: block;
-  width: min(460px, 28vw);
-  aspect-ratio: 3 / 4;
+  align-self: stretch;
+  position: relative;
+  width: min(460px, 30vw);
+}
+
+.about-photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
+  object-position: center 45%;
 }
 
 .side-links {
@@ -203,8 +212,10 @@ body {
     justify-self: start;
     margin: 0;
   }
+  /* Stacked on phones there's no text beside it to match, so give it its own shape */
   .about-photo {
     width: min(320px, 100%);
+    aspect-ratio: 3 / 4;
   }
 }
 
