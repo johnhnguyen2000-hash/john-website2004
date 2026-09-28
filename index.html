@@ -39,31 +39,31 @@
     .cards {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 1.25rem;
+      gap: 0.875rem;
       margin-top: 1.5rem;
-      /* match the name's width instead of stretching to fit the card text */
-      width: 0;
-      min-width: 100%;
+      /* Stretch wider than the name so each box has room for its text on one or two lines */
+      width: 52rem;
+      max-width: 100%;
     }
 
     .card {
-      padding: 0.875rem;
+      padding: 0.625rem 0.75rem;
       background: #1e4d2b;
       color: #fff;
       text-align: left;
     }
 
     .card-label {
-      font-size: 0.75rem;
+      font-size: 0.6875rem;
       font-weight: 600;
       letter-spacing: 0.1em;
       text-transform: uppercase;
       opacity: 0.7;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.3rem;
     }
 
     .card-text {
-      font-size: 1rem;
+      font-size: 0.9375rem;
       font-weight: 600;
       line-height: 1.3;
     }
