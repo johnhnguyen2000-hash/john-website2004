@@ -19,12 +19,12 @@
       flex: 2;
       display: flex;
       flex-direction: column;
-      align-items: center;
+      /* Left-aligned, still centered top to bottom */
+      align-items: flex-start;
       justify-content: center;
-      text-align: center;
-      padding: 4rem;
+      text-align: left;
+      padding: 4rem 4rem 4rem 6vw;
     }
-
 
     .intro {
       position: relative;
@@ -88,10 +88,12 @@
     }
 
     .hero-left h1 {
-      font-size: clamp(3.5rem, 9vw, 10rem);
+      font-size: clamp(2.75rem, 9vw, 10rem);
       font-weight: 700;
       line-height: 1;
       letter-spacing: -0.02em;
+      /* Always one line */
+      white-space: nowrap;
     }
 
     .hero-left h1 .dot {
