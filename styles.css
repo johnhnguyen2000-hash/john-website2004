@@ -96,12 +96,13 @@ body {
 .about-grid {
   display: grid;
   /* Text | photo | links, spread across the page with equal space between them */
-  grid-template-columns: minmax(0, 38rem) auto auto;
+  grid-template-columns: minmax(0, 34rem) auto auto;
   justify-content: space-between;
   align-items: center;
   column-gap: 3rem;
   min-height: 100vh;
-  padding: 5rem 8vw;
+  /* Generous side margins so nothing crowds the edges of the window */
+  padding: 5rem 14vw;
 }
 
 .about-grid .page {
@@ -135,14 +136,14 @@ body {
 /* "Who am I?" styled like a note in Apple Notes */
 /* No card or border: the note sits right on the page background */
 .page .note h1 {
-  font-size: clamp(2.5rem, 4.5vw, 3.5rem);
+  font-size: clamp(2.25rem, 3.8vw, 3rem);
   font-weight: 700;
   letter-spacing: -0.015em;
   margin-bottom: 1.25rem;
 }
 
 .page .note p {
-  font-size: 1.3125rem;
+  font-size: 1.1875rem;
   line-height: 1.55;
   color: #1c1c1e;
   margin-bottom: 1.1rem;
@@ -171,7 +172,7 @@ body {
   grid-row: 1;
   align-self: stretch;
   position: relative;
-  width: min(460px, 30vw);
+  width: min(400px, 24vw);
 }
 
 .about-photo img {
