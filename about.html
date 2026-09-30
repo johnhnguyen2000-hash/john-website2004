@@ -65,7 +65,7 @@
         const height = to.getBoundingClientRect().bottom - from.getBoundingClientRect().top;
         photo.style.alignSelf = 'start';
         photo.style.height = `${height}px`;
-        photo.style.width = `${height * 768 / 779}px`;
+        photo.style.width = `${height * 768 / 1024}px`;
         photo.style.marginTop = `${from.getBoundingClientRect().top - photo.getBoundingClientRect().top}px`;
       }
 

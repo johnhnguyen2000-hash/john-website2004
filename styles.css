@@ -172,8 +172,8 @@ body {
   align-self: center;
   position: relative;
   width: min(260px, 17vw);
-  /* Photo is already cropped to shape, so it shows whole */
-  aspect-ratio: 768 / 779;
+  /* Same shape as the photo, so it shows whole */
+  aspect-ratio: 768 / 1024;
 }
 
 .about-photo img {
