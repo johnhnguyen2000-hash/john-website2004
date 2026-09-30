@@ -51,22 +51,25 @@
       setInterval(tick, 15000);
     })();
 
-    // Portrait runs from the "in Boston, Massachusetts" line down to the end of
-    // the last paragraph, so it lines up with the text beside it
+    // Portrait is centered on the stretch from the "in Boston, Massachusetts"
+    // line to the end of the last paragraph, and a little taller than it
     (() => {
       const photo = document.querySelector('.about-photo');
       const from = document.querySelector('.local-time');
       const to = document.querySelector('.note-body p:last-child');
       const stacked = window.matchMedia('(max-width: 700px)');
+      const EXTRA = 0.15;        // how much taller than the text stretch
 
       function fit() {
         photo.style.cssText = '';
         if (stacked.matches) return;
-        const height = to.getBoundingClientRect().bottom - from.getBoundingClientRect().top;
+        const span = to.getBoundingClientRect().bottom - from.getBoundingClientRect().top;
+        const height = span * (1 + EXTRA);
         photo.style.alignSelf = 'start';
         photo.style.height = `${height}px`;
         photo.style.width = `${height * 768 / 1024}px`;
-        photo.style.marginTop = `${from.getBoundingClientRect().top - photo.getBoundingClientRect().top}px`;
+        const top = from.getBoundingClientRect().top - (height - span) / 2;
+        photo.style.marginTop = `${top - photo.getBoundingClientRect().top}px`;
       }
 
       new ResizeObserver(fit).observe(document.querySelector('.about-grid .page'));
