@@ -95,14 +95,14 @@ body {
    the middle, links stacked on the right (every sub-page slides in from there). */
 .about-grid {
   display: grid;
-  /* Text | photo | links, spread across the page with equal space between them */
-  grid-template-columns: minmax(0, 34rem) auto auto;
-  justify-content: space-between;
+  /* Text | photo | links, with the same gap before, between, and after them */
+  grid-template-columns: minmax(0, 32rem) auto auto;
+  justify-content: space-evenly;
   align-items: center;
   column-gap: 3rem;
   min-height: 100vh;
-  /* Generous side margins so nothing crowds the edges of the window */
-  padding: 5rem 14vw;
+  /* Side margins so nothing touches the edges of the window */
+  padding: 5rem 4vw;
 }
 
 .about-grid .page {
@@ -165,14 +165,14 @@ body {
   text-underline-offset: 3px;
 }
 
-/* Portrait in the middle column. It stretches to exactly the height of the
-   text block beside it, so text and photo sit as two matching blocks. */
+/* Portrait in the middle column, kept small enough to leave room on both sides */
 .about-photo {
   grid-column: 2;
   grid-row: 1;
-  align-self: stretch;
+  align-self: center;
   position: relative;
-  width: min(400px, 24vw);
+  width: min(300px, 20vw);
+  aspect-ratio: 3 / 4;
 }
 
 .about-photo img {

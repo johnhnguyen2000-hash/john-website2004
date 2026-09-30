@@ -27,30 +27,48 @@
       height: 210px;
     }
 
-    /* Projects fade in once the helmet is finished */
+    /* Project boxes, same look as the Recent News cards. One project fills
+       the row; more projects wrap into columns side by side. */
     .work {
-      opacity: 0;
-      translate: 0 12px;
-      transition: opacity 0.9s ease, translate 0.9s ease;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 1.25rem;
     }
 
-    .work.revealed {
-      opacity: 1;
-      translate: 0 0;
-    }
-
-    .project h3 {
-      font-size: 1.25rem;
-      font-weight: 700;
-      margin-bottom: 0.75rem;
+    .project {
+      background: #fff;
+      border: 1px solid #e5e5e5;
+      overflow: hidden;
     }
 
     .project img {
       display: block;
       width: 100%;
-      border: 1px solid #e5e5e5;
-      border-radius: 8px;
+      height: auto;
+    }
+
+    .project-body {
+      padding: 1.25rem 1.5rem;
+    }
+
+    .project-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #0f2d6b;
+      margin-bottom: 0.625rem;
+    }
+
+    .page .project h3 {
+      font-size: 1.625rem;
+      font-weight: 700;
+      line-height: 1.2;
       margin-bottom: 1rem;
+    }
+
+    .page .project p:last-child {
+      margin-bottom: 0;
     }
 
     @media (max-width: 700px) {
@@ -60,10 +78,9 @@
       .workshop {
         height: 140px;
       }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .work { transition: none; }
+      .work {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -78,9 +95,12 @@
       <div class="work">
         <!-- Add one .project per thing you're working on -->
         <article class="project">
-          <h3>Plastic Surgery Planning</h3>
           <img src="images/plastic-surgery-planning.png" alt="Facial Visualization Prototype showing two shaded 3D heads side by side, before and after rotating the nose tip upward, with sliders for the nose, chin, jaw, and cheeks">
-          <p>An AI model that shows patients a before-and-after preview of their plastic surgery. Changes can be described in plain language to an LLM, like &ldquo;rotate the nose tip upward,&rdquo; or made by hand with simple sliders for the nose, chin, jaw, cheeks, and lips.</p>
+          <div class="project-body">
+            <p class="project-label">In progress</p>
+            <h3>Plastic Surgery Planning</h3>
+            <p>An AI model that shows patients a before-and-after preview of their plastic surgery. Changes can be described in plain language to an LLM, like &ldquo;rotate the nose tip upward,&rdquo; or made by hand with simple sliders for the nose, chin, jaw, cheeks, and lips.</p>
+          </div>
         </article>
       </div>
     </div>
@@ -89,12 +109,11 @@
   <script>
     // ---------- Building a helmet from scratch at a cafe table ----------
     // The rest of the suit stands behind him. Each hammer strike throws sparks
-    // and adds a piece to the helmet. Once it's done the projects fade in, and
-    // he keeps hammering while turning the helmet with his other hand.
+    // and adds a piece to the helmet. Once it's done he keeps hammering while
+    // turning the helmet with his other hand.
     (() => {
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       const canvas = document.querySelector('.workshop');
-      const work = document.querySelector('.work');
       const ctx = canvas.getContext('2d');
       const INK = '#1a1a1a';
       const GREEN = '#1e4d2b';
@@ -109,7 +128,6 @@
       let time = 0;              // seconds since the animation started
       let pieces = 0;            // helmet pieces added so far
       let doneFor = -1;          // seconds since the helmet was finished (-1 = still building)
-      let revealed = false;
       let sparks = [];
       let turn = 0;              // helmet rotation once it's finished (radians)
 
@@ -394,11 +412,6 @@
         }
       }
 
-      function reveal() {
-        revealed = true;
-        work.classList.add('revealed');
-      }
-
       let last = 0;
       function loop(now) {
         const dt = last ? Math.min(0.05, (now - last) / 1000) : 0;
@@ -418,7 +431,6 @@
 
         if (doneFor >= 0) {
           doneFor += dt;
-          if (doneFor > 0.6 && !revealed) reveal();
           // Turn the helmet a bit between blows, not while the hammer lands
           const phase = (time / STRIKE_TIME) % 1;
           if (phase < 0.6) turn += dt * 1.6;
@@ -443,7 +455,6 @@
         doneFor = 1;
         time = STRIKE_TIME * 0.75;   // resting pose: hammer on the helmet
         draw();
-        reveal();
       } else {
         requestAnimationFrame(loop);
       }
