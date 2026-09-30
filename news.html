@@ -8,26 +8,13 @@
   <link rel="stylesheet" href="transitions.css">
   <script src="transitions.js"></script>
   <style>
-    /* Big story across the top; below it, two stacked text boxes on the left
-       and a photo box on the right spanning both */
+    /* News boxes use the same size and layout as the What I'm Working On
+       cards: photo on top, then date, title, and text. Two per row, centered. */
     .news-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(auto-fill, min(100%, 500px));
+      justify-content: center;
       gap: 1.25rem;
-    }
-
-    .news-medium {
-      grid-column: 2;
-      grid-row: 2 / 4;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* Photo stretches to fill whatever height the two left boxes create */
-    .news-grid .news-medium img.news-photo {
-      flex: 1;
-      min-height: 220px;
-      aspect-ratio: auto;
     }
 
     .news-card {
@@ -36,28 +23,14 @@
       overflow: hidden;
     }
 
-    .news-top {
-      grid-column: 1 / -1;
-      display: grid;
-      grid-template-columns: 1.2fr 1fr;
-    }
-
     .news-card img {
       display: block;
       width: 100%;
-      height: 100%;
-      object-fit: cover;
+      height: auto;
     }
 
     .news-body {
-      padding: 1.75rem;
-    }
-
-    .news-top .news-body {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 2.5rem;
+      padding: 1.25rem 1.5rem;
     }
 
     .news-label {
@@ -70,54 +43,14 @@
     }
 
     .page .news-card h3 {
-      font-size: 1.5rem;
+      font-size: 1.625rem;
       font-weight: 700;
       line-height: 1.2;
       margin-bottom: 1rem;
     }
 
-    /* Each box gets its own title size so the grid doesn't look uniform */
-    .page .news-top h3 {
-      font-size: 2.25rem;
-      letter-spacing: -0.01em;
-    }
-
-    .page .news-small h3 {
-      font-size: 1.125rem;
-      line-height: 1.35;
-    }
-
-    .page .news-medium h3 {
-      font-size: 1.625rem;
-    }
-
     .page .news-card p:last-child {
       margin-bottom: 0;
-    }
-
-    /* Photo across the top of the medium box */
-    .news-card img.news-photo {
-      height: auto;
-      aspect-ratio: 9 / 4;
-      object-position: center 30%;
-    }
-
-    .news-grid > .news-card:not(.news-top) .news-body {
-      padding: 1.25rem 1.5rem;
-    }
-
-    @media (max-width: 800px) {
-      .news-medium {
-        grid-column: auto;
-        grid-row: auto;
-      }
-      .news-grid,
-      .news-top {
-        grid-template-columns: 1fr;
-      }
-      .news-top .news-body {
-        padding: 1.75rem;
-      }
     }
   </style>
 </head>
@@ -127,7 +60,7 @@
     <h1>Recent News</h1>
 
     <div class="news-grid">
-      <article class="news-card news-top">
+      <article class="news-card">
         <img src="images/intelli-schools.png" alt="Students at Intelli Schools watching a skin health presentation on a classroom screen">
         <div class="news-body">
           <p class="news-label">April 2026</p>
@@ -136,7 +69,16 @@
         </div>
       </article>
 
-      <article class="news-card news-small">
+      <article class="news-card">
+        <img src="images/mayo-crisp.jpeg" alt="John standing beside his research poster on solid organ transplantation outcomes">
+        <div class="news-body">
+          <p class="news-label">July 2026</p>
+          <h3>CRISP Intern at Mayo Clinic</h3>
+          <p>Presented a multi-site retrospective cohort analysis of survival, graft failure, and social determinants of health following solid organ transplantation.</p>
+        </div>
+      </article>
+
+      <article class="news-card">
         <div class="news-body">
           <p class="news-label">April 2026</p>
           <h3>National Association of School Psychologists Presentation</h3>
@@ -144,20 +86,11 @@
         </div>
       </article>
 
-      <article class="news-card news-small">
+      <article class="news-card">
         <div class="news-body">
           <p class="news-label">September 2026</p>
           <h3>Using Spatial Proximity as a Discriminatory Factor for Acne-Identifying CNN Models</h3>
           <p>Using the Clark&ndash;Evans test, Skinapse found that spatial clustering and lesion-to-lesion proximity can raise the confidence of CNN models trained on the ACNE04 dataset.</p>
-        </div>
-      </article>
-
-      <article class="news-card news-medium">
-        <img class="news-photo" src="images/mayo-crisp.jpeg" alt="John standing beside his research poster on solid organ transplantation outcomes">
-        <div class="news-body">
-          <p class="news-label">July 2026</p>
-          <h3>CRISP Intern at Mayo Clinic</h3>
-          <p>Presented a multi-site retrospective cohort analysis of survival, graft failure, and social determinants of health following solid organ transplantation.</p>
         </div>
       </article>
     </div>
