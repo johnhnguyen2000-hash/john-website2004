@@ -96,7 +96,7 @@ body {
 .about-grid {
   display: grid;
   /* Text | photo | links, with the same gap before, between, and after them */
-  grid-template-columns: minmax(0, 32rem) auto auto;
+  grid-template-columns: minmax(0, 42rem) auto auto;
   justify-content: space-evenly;
   align-items: center;
   column-gap: 3rem;
@@ -136,17 +136,17 @@ body {
 /* "Who am I?" styled like a note in Apple Notes */
 /* No card or border: the note sits right on the page background */
 .page .note h1 {
-  font-size: clamp(2.25rem, 3.8vw, 3rem);
+  font-size: clamp(2rem, 3.2vw, 2.625rem);
   font-weight: 700;
   letter-spacing: -0.015em;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1rem;
 }
 
 .page .note p {
-  font-size: 1.1875rem;
+  font-size: 1.0625rem;
   line-height: 1.55;
   color: #1c1c1e;
-  margin-bottom: 1.1rem;
+  margin-bottom: 0.9rem;
 }
 
 /* "6:16 PM in Boston" in grey under the heading */
@@ -171,7 +171,7 @@ body {
   grid-row: 1;
   align-self: center;
   position: relative;
-  width: min(300px, 20vw);
+  width: min(240px, 16vw);
   aspect-ratio: 3 / 4;
 }
 

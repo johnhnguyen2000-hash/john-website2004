@@ -27,11 +27,11 @@
       height: 210px;
     }
 
-    /* Project boxes, same look as the Recent News cards. One project fills
-       the row; more projects wrap into columns side by side. */
+    /* Project boxes, same look and size as the Recent News cards: two per
+       row, wrapping onto new rows as more projects are added. */
     .work {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
       gap: 1.25rem;
     }
 
