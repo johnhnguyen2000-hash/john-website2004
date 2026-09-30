@@ -8,6 +8,37 @@
   <link rel="stylesheet" href="transitions.css">
   <script src="transitions.js"></script>
   <style>
+    .page.page-wide {
+      max-width: 1200px;
+    }
+
+    /* ---------- The scene: a small workshop drawing, then what he's building ---------- */
+    .scene {
+      display: grid;
+      /* Same split as the cliff on Life in My Eyes */
+      grid-template-columns: 1.25fr 5fr;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .workshop {
+      display: block;
+      width: 100%;
+      height: 210px;
+    }
+
+    /* Projects fade in once the helmet is finished */
+    .work {
+      opacity: 0;
+      translate: 0 12px;
+      transition: opacity 0.9s ease, translate 0.9s ease;
+    }
+
+    .work.revealed {
+      opacity: 1;
+      translate: 0 0;
+    }
+
     .project h3 {
       font-size: 1.25rem;
       font-weight: 700;
@@ -21,19 +52,402 @@
       border-radius: 8px;
       margin-bottom: 1rem;
     }
+
+    @media (max-width: 700px) {
+      .scene {
+        grid-template-columns: 1fr;
+      }
+      .workshop {
+        height: 140px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .work { transition: none; }
+    }
   </style>
 </head>
 <body>
-  <main class="page">
+  <main class="page page-wide">
     <a class="back" href="about.html" aria-label="Back to About Me">&larr;</a>
     <h1>What I&rsquo;m Working On</h1>
 
-    <!-- Add one .project per thing you're working on -->
-    <article class="project">
-      <h3>Plastic Surgery Planning</h3>
-      <img src="images/plastic-surgery-planning.png" alt="Side-by-side 3D head models labeled Before and After, with sliders for nose, chin, jaw, cheeks, and lips, and a text box for describing changes">
-      <p>An AI model that shows patients a before-and-after preview of their plastic surgery. Changes can be described in plain language to an LLM, like &ldquo;a stronger chin&rdquo; or &ldquo;a slightly smaller nose and fuller lips,&rdquo; or made by hand with simple sliders for the nose, chin, jaw, cheeks, and lips.</p>
-    </article>
+    <div class="scene">
+      <canvas class="workshop" aria-hidden="true"></canvas>
+
+      <div class="work">
+        <!-- Add one .project per thing you're working on -->
+        <article class="project">
+          <h3>Plastic Surgery Planning</h3>
+          <img src="images/plastic-surgery-planning.png" alt="Facial Visualization Prototype showing two shaded 3D heads side by side, before and after rotating the nose tip upward, with sliders for the nose, chin, jaw, and cheeks">
+          <p>An AI model that shows patients a before-and-after preview of their plastic surgery. Changes can be described in plain language to an LLM, like &ldquo;rotate the nose tip upward,&rdquo; or made by hand with simple sliders for the nose, chin, jaw, cheeks, and lips.</p>
+        </article>
+      </div>
+    </div>
   </main>
+
+  <script>
+    // ---------- Building a helmet from scratch at a cafe table ----------
+    // The rest of the suit stands behind him. Each hammer strike throws sparks
+    // and adds a piece to the helmet. Once it's done the projects fade in, and
+    // he keeps hammering while turning the helmet with his other hand.
+    (() => {
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const canvas = document.querySelector('.workshop');
+      const work = document.querySelector('.work');
+      const ctx = canvas.getContext('2d');
+      const INK = '#1a1a1a';
+      const GREEN = '#1e4d2b';
+      const RED = '#a8322d';
+      const SPARK = '#e0952b';
+      const REACTOR = '#5fb3c9';
+      const SCALE = 1.25;        // same size as the cliff runner
+      const STRIKE_TIME = 0.75;  // seconds per hammer blow
+
+      let width = 0;
+      let height = 0;
+      let time = 0;              // seconds since the animation started
+      let pieces = 0;            // helmet pieces added so far
+      let doneFor = -1;          // seconds since the helmet was finished (-1 = still building)
+      let revealed = false;
+      let sparks = [];
+      let turn = 0;              // helmet rotation once it's finished (radians)
+
+      const groundY = () => height * 0.78;
+      const suitX = () => width * 0.14;
+      const figureX = () => width * 0.42;
+      const benchY = () => groundY() - 17 * SCALE;
+      const helmetX = () => figureX() + 20 * SCALE;
+      const cupX = () => width * 0.88;
+      const HELMET_SIZE = 0.75;
+
+      // The helmet, one stroke per hammer blow (origin at its base, centered)
+      const HELMET = [
+        () => { ctx.arc(0, -12, 8, Math.PI, Math.PI * 1.5); },
+        () => { ctx.arc(0, -12, 8, Math.PI * 1.5, Math.PI * 2); },
+        () => { ctx.moveTo(-8, -12); ctx.lineTo(-7, -5); ctx.lineTo(-3, 0); ctx.lineTo(0, 0); },
+        () => { ctx.moveTo(8, -12); ctx.lineTo(7, -5); ctx.lineTo(3, 0); ctx.lineTo(0, 0); },
+        () => { ctx.moveTo(-6, -14); ctx.quadraticCurveTo(0, -16, 6, -14); },
+        () => { ctx.moveTo(-5, -10); ctx.lineTo(-1.5, -9.5); ctx.moveTo(1.5, -9.5); ctx.lineTo(5, -10); },
+        () => { ctx.moveTo(-3, -4); ctx.lineTo(3, -4); },
+      ];
+
+      function resize() {
+        const dpr = window.devicePixelRatio || 1;
+        width = canvas.clientWidth;
+        height = canvas.clientHeight;
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        draw();
+      }
+
+      function drawRoom() {
+        const gy = groundY();
+        const by = benchY();
+        const left = figureX() + 9 * SCALE;
+        const right = width * 0.95;
+        ctx.strokeStyle = GREEN;
+        ctx.lineWidth = 2.5;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        // Floor
+        ctx.moveTo(0, gy);
+        ctx.lineTo(width, gy);
+        // Table top and legs
+        ctx.moveTo(left, by);
+        ctx.lineTo(right, by);
+        ctx.moveTo(left + 4, by);
+        ctx.lineTo(left + 4, gy);
+        ctx.moveTo(right - 4, by);
+        ctx.lineTo(right - 4, gy);
+        ctx.stroke();
+
+        // Pendant cafe lamp over the helmet
+        const lx = helmetX();
+        const ly = by - 62;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(lx, 0);
+        ctx.lineTo(lx, ly);
+        ctx.moveTo(lx - 9, ly + 9);
+        ctx.quadraticCurveTo(lx, ly - 5, lx + 9, ly + 9);
+        ctx.closePath();
+        ctx.stroke();
+
+        // Coffee cup with a little steam
+        const cx = cupX();
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(cx - 5, by - 10);
+        ctx.lineTo(cx - 4, by);
+        ctx.lineTo(cx + 4, by);
+        ctx.lineTo(cx + 5, by - 10);
+        ctx.closePath();
+        ctx.moveTo(cx + 5, by - 8);
+        ctx.quadraticCurveTo(cx + 10, by - 6, cx + 4.5, by - 3);
+        ctx.stroke();
+        ctx.lineWidth = 1.2;
+        ctx.globalAlpha = 0.5;
+        ctx.beginPath();
+        for (const off of [-2, 2]) {
+          const sway = reduceMotion ? 0 : Math.sin(time * 2 + off) * 1.5;
+          ctx.moveTo(cx + off, by - 13);
+          ctx.quadraticCurveTo(cx + off + 3 + sway, by - 17, cx + off - sway, by - 22);
+        }
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+
+      // Turning is faked in 2D: the outline narrows a little toward the side
+      // view, and the face slides across it and disappears round the back.
+      function drawHelmet() {
+        const facing = Math.cos(turn);
+        const outlineWidth = 0.65 + 0.35 * Math.abs(facing);
+        ctx.save();
+        ctx.translate(helmetX(), benchY());
+        ctx.scale(HELMET_SIZE, HELMET_SIZE);
+        ctx.strokeStyle = RED;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        HELMET.slice(0, pieces).forEach((piece, i) => {
+          const isFace = i >= 4;
+          if (isFace && facing <= 0.05) return;
+          ctx.save();
+          if (isFace) {
+            ctx.translate(Math.sin(turn) * 5, 0);
+            ctx.scale(facing * outlineWidth, 1);
+            ctx.lineWidth = 2 / HELMET_SIZE / Math.max(0.6, facing);
+          } else {
+            ctx.scale(outlineWidth, 1);
+            ctx.lineWidth = 2 / HELMET_SIZE;
+          }
+          ctx.beginPath();
+          piece();
+          ctx.stroke();
+          ctx.restore();
+        });
+        ctx.restore();
+      }
+
+      // The rest of the suit on a stand behind him, waiting for its helmet
+      function drawSuit() {
+        ctx.save();
+        ctx.translate(suitX(), groundY());
+        ctx.scale(SCALE, SCALE);
+        ctx.strokeStyle = RED;
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        // Neck ring and shoulders
+        ctx.moveTo(-2, -29);
+        ctx.lineTo(2, -29);
+        ctx.moveTo(-6.5, -26.5);
+        ctx.lineTo(6.5, -26.5);
+        // Chest tapering to the waist
+        ctx.moveTo(-6, -26.5);
+        ctx.lineTo(-4, -15);
+        ctx.lineTo(4, -15);
+        ctx.lineTo(6, -26.5);
+        // Arms hanging at the sides
+        ctx.moveTo(-6.5, -26);
+        ctx.lineTo(-7.5, -19);
+        ctx.lineTo(-7, -13);
+        ctx.moveTo(6.5, -26);
+        ctx.lineTo(7.5, -19);
+        ctx.lineTo(7, -13);
+        // Legs
+        ctx.moveTo(-2.5, -15);
+        ctx.lineTo(-3, -7.5);
+        ctx.lineTo(-3, 0);
+        ctx.lineTo(-5, 0);
+        ctx.moveTo(2.5, -15);
+        ctx.lineTo(3, -7.5);
+        ctx.lineTo(3, 0);
+        ctx.lineTo(5, 0);
+        ctx.stroke();
+        // Glowing chest reactor
+        ctx.fillStyle = REACTOR;
+        ctx.beginPath();
+        ctx.arc(0, -22.5, 1.6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function limb(x1, y1, len, angle) {
+        const x2 = x1 + Math.sin(angle) * len;
+        const y2 = y1 + Math.cos(angle) * len;
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        return [x2, y2];
+      }
+
+      // Same stick figure as the cliff runner, plus a hammer in his front hand
+      function drawFigure(px, py, pose) {
+        ctx.save();
+        ctx.translate(px, py);
+        ctx.scale(SCALE, SCALE);
+        ctx.rotate(pose.lean);
+        ctx.strokeStyle = INK;
+        ctx.fillStyle = INK;
+        ctx.lineWidth = 2.2;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        const hipY = -14;
+        const shoulderY = -27;
+        let [kx, ky] = limb(0, hipY, 7.5, pose.legs[0]);
+        limb(kx, ky, 7.5, pose.legs[1]);
+        [kx, ky] = limb(0, hipY, 7.5, pose.legs[2]);
+        limb(kx, ky, 7.5, pose.legs[3]);
+        ctx.moveTo(0, hipY);
+        ctx.lineTo(0, shoulderY);
+        let [ex, ey] = limb(0, shoulderY + 1.5, 6, pose.arms[0]);
+        const [hx, hy] = limb(ex, ey, 6, pose.arms[1]);
+        [ex, ey] = limb(0, shoulderY + 1.5, 6, pose.arms[2]);
+        limb(ex, ey, 6, pose.arms[3]);
+        ctx.stroke();
+
+        // Hammer: handle runs on from the forearm, head sits across the end
+        const a = pose.arms[1];
+        const tx = hx + Math.sin(a) * 7;
+        const ty = hy + Math.cos(a) * 7;
+        ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        ctx.moveTo(hx, hy);
+        ctx.lineTo(tx, ty);
+        ctx.stroke();
+        ctx.lineWidth = 3.2;
+        ctx.lineCap = 'butt';
+        ctx.beginPath();
+        ctx.moveTo(tx + Math.cos(a) * 2.5, ty - Math.sin(a) * 2.5);
+        ctx.lineTo(tx - Math.cos(a) * 2.5, ty + Math.sin(a) * 2.5);
+        ctx.stroke();
+        ctx.lineCap = 'round';
+
+        ctx.beginPath();
+        ctx.arc(0.5, shoulderY - 5, 4.2, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Sparks live in the figure's own coordinates so they start at the hammer
+        ctx.strokeStyle = SPARK;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        for (const s of sparks) {
+          ctx.moveTo(s.x, s.y);
+          ctx.lineTo(s.x - s.vx * 0.03, s.y - s.vy * 0.03);
+        }
+        ctx.stroke();
+        ctx.restore();
+
+        return { x: tx, y: ty + 2.5 };
+      }
+
+      const LEGS = [0.12, 0.08, -0.12, -0.1];
+      const STRIKE = [1.9, 1.9];    // front arm forward, hammer landing on top of the helmet
+      const RAISED = [2.8, 3.5];    // front arm up behind his head
+      const HOLD = [1.35, 1.6];     // back hand on the side of the helmet
+      const lerp = (a, b, k) => a + (b - a) * k;
+
+      // k = 0 at the strike, 1 fully raised
+      function hammerPose(k) {
+        return {
+          lean: 0.08,
+          legs: LEGS,
+          arms: [lerp(STRIKE[0], RAISED[0], k), lerp(STRIKE[1], RAISED[1], k), ...HOLD],
+        };
+      }
+
+      // Slow lift, quick swing down, short rest on the table
+      function swing(phase) {
+        if (phase < 0.6) {
+          const t = phase / 0.6;
+          return t * t * (3 - 2 * t);
+        }
+        if (phase < 0.75) {
+          const t = (phase - 0.6) / 0.15;
+          return 1 - t * t;
+        }
+        return 0;
+      }
+
+      let strikePoint = { x: 0, y: 0 };
+      function draw() {
+        ctx.clearRect(0, 0, width, height);
+        drawRoom();
+        drawSuit();
+        drawHelmet();
+        strikePoint = drawFigure(figureX(), groundY(), hammerPose(swing((time / STRIKE_TIME) % 1)));
+      }
+
+      function throwSparks() {
+        for (let i = 0; i < 7; i++) {
+          sparks.push({
+            x: strikePoint.x,
+            y: strikePoint.y,
+            vx: -30 + Math.random() * 75,
+            vy: -25 - Math.random() * 35,
+            life: 0.35 + Math.random() * 0.2,
+          });
+        }
+      }
+
+      function reveal() {
+        revealed = true;
+        work.classList.add('revealed');
+      }
+
+      let last = 0;
+      function loop(now) {
+        const dt = last ? Math.min(0.05, (now - last) / 1000) : 0;
+        last = now;
+        const before = time;
+        time += dt;
+
+        // A blow lands at 75% of each swing
+        const landed = Math.floor(time / STRIKE_TIME - 0.75) > Math.floor(before / STRIKE_TIME - 0.75);
+        if (landed && time > STRIKE_TIME) {
+          throwSparks();
+          if (doneFor < 0) {
+            pieces += 1;
+            if (pieces >= HELMET.length) doneFor = 0;
+          }
+        }
+
+        if (doneFor >= 0) {
+          doneFor += dt;
+          if (doneFor > 0.6 && !revealed) reveal();
+          // Turn the helmet a bit between blows, not while the hammer lands
+          const phase = (time / STRIKE_TIME) % 1;
+          if (phase < 0.6) turn += dt * 1.6;
+        }
+
+        sparks = sparks.filter((s) => (s.life -= dt) > 0);
+        for (const s of sparks) {
+          s.vy += 140 * dt;
+          s.x += s.vx * dt;
+          s.y += s.vy * dt;
+        }
+
+        draw();
+        requestAnimationFrame(loop);
+      }
+
+      new ResizeObserver(resize).observe(canvas);
+      resize();
+
+      if (reduceMotion) {
+        pieces = HELMET.length;
+        doneFor = 1;
+        time = STRIKE_TIME * 0.75;   // resting pose: hammer on the helmet
+        draw();
+        reveal();
+      } else {
+        requestAnimationFrame(loop);
+      }
+    })();
+  </script>
 </body>
 </html>
