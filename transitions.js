@@ -3,7 +3,8 @@
 //
 //                     ┌─ Recent News
 //   Home ── About ────┼─ Experiences
-//                     └─ Life in My Eyes
+//                     ├─ Life in My Eyes
+//                     └─ What I'm Working On
 (() => {
   const POSITIONS = {
     index: [0, 0],
@@ -11,6 +12,7 @@
     experiences: [2, 0],
     skills: [2, 0],
     news: [2, 0],
+    'working-on': [2, 0],
   };
 
   function pageOf(url) {

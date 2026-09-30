@@ -204,26 +204,6 @@
       }
     }
 
-    /* "What I'm Working On" list under the photos */
-    .working-on {
-      max-width: 760px;
-      margin-top: 3rem;
-    }
-
-    .project h3 {
-      font-size: 1.25rem;
-      font-weight: 700;
-      margin-bottom: 0.75rem;
-    }
-
-    .project img {
-      display: block;
-      width: 100%;
-      border: 1px solid #e5e5e5;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-    }
-
     @media (prefers-reduced-motion: reduce) {
       .frame img, .floater { animation: none; }
       .viewer.open { animation: none; }
@@ -240,16 +220,6 @@
       <canvas class="cliff" aria-hidden="true"></canvas>
       <div class="view" aria-label="Photos"></div>
     </div>
-
-    <section class="working-on">
-      <h2>What I&rsquo;m Working On</h2>
-      <!-- Add one .project per thing you're working on -->
-      <article class="project">
-        <h3>Plastic Surgery Planning</h3>
-        <img src="images/plastic-surgery-planning.png" alt="Side-by-side 3D head models labeled Before and After, with sliders for nose, chin, jaw, cheeks, and lips, and a text box for describing changes">
-        <p>An AI model that shows patients a before-and-after preview of their plastic surgery. Changes can be described in plain language to an LLM, like &ldquo;a stronger chin&rdquo; or &ldquo;a slightly smaller nose and fuller lips,&rdquo; or made by hand with simple sliders for the nose, chin, jaw, cheeks, and lips.</p>
-      </article>
-    </section>
   </main>
 
   <div class="viewer" role="dialog" aria-modal="true" aria-label="Photo">
