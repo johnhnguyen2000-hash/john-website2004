@@ -173,7 +173,7 @@ body {
   position: relative;
   width: min(260px, 17vw);
   /* Photo is already cropped to shape, so it shows whole */
-  aspect-ratio: 768 / 819;
+  aspect-ratio: 768 / 779;
 }
 
 .about-photo img {
