@@ -241,6 +241,26 @@ body {
   margin: 1.75rem 0 1rem;
 }
 
+/* Recent News, Experiences, and What I'm Working On: smaller title and
+   roomier spacing, to match the "Who am I?" page */
+.page.page-spaced {
+  padding-top: 5rem;
+}
+
+.page.page-spaced h1 {
+  font-size: clamp(1.875rem, 3vw, 2.375rem);
+  letter-spacing: -0.015em;
+  margin-bottom: 2.25rem;
+}
+
+.page-spaced h2 {
+  margin: 2.5rem 0 1.25rem;
+}
+
+.page-spaced .entry {
+  margin-bottom: 1.25rem;
+}
+
 /* One job, role, or award */
 .entry {
   margin-bottom: 0.75rem;
