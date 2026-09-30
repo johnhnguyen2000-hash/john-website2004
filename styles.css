@@ -113,6 +113,16 @@ body {
   min-height: 0;
   margin: 0;
   padding: 0;
+  position: relative;
+}
+
+/* Back arrow floats above the text so only the text itself is centered
+   vertically, lining it up with the photo and links beside it */
+.about-grid .back {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  margin-bottom: 1.5rem;
 }
 
 /* Borderless text links for moving between sub-pages */
