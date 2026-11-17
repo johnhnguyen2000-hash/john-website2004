@@ -1,0 +1,12 @@
+{
+  "redirects": [
+    { "source": "/working-on.html", "destination": "/projects.html", "permanent": true },
+    { "source": "/skills.html", "destination": "/", "permanent": true }
+  ],
+  "headers": [
+    {
+      "source": "/images/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800" }]
+    }
+  ]
+}

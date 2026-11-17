@@ -2,79 +2,48 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>About Me | John Nguyen</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>About · John Nguyen</title>
+  <meta name="description" content="John Nguyen is a Northeastern University student, founder of Skinapse AI Lab, and clinical researcher in Boston.">
+  <meta name="theme-color" content="#FFFFFF">
+  <meta property="og:title" content="About · John Nguyen">
+  <meta property="og:description" content="John Nguyen is a Northeastern University student, founder of Skinapse AI Lab, and clinical researcher in Boston.">
+  <meta property="og:image" content="https://jnguyen.net/images/john-portrait.webp">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
   <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="transitions.css">
-  <script src="transitions.js"></script>
+  <script>document.documentElement.classList.add("js")</script>
+  <script src="script.js" defer></script>
 </head>
 <body>
-  <div class="about-grid">
-    <main class="page">
-      <a class="back" href="index.html" aria-label="Back to Home">&larr;</a>
-      <!-- Styled like a note in Apple Notes -->
-      <article class="note">
-        <div class="note-body">
-          <h1>Who am I?</h1>
-          <p class="local-time"><span class="clock">&nbsp;</span> in Boston, Massachusetts</p>
-          <p>I was raised in Washington, D.C., and now I'm building a venture focused on skin health.</p>
-          <p>Previously, I've done research at schools such as <u>Yale School of Medicine</u>, <u>Mayo Clinic School of Medicine</u>, and <u>Harvard School of Medicine</u>. Now I aim to help healthcare startups build and scale.</p>
-          <p>More than my own accomplishments, I believe my hobbies are what truly define me. I sing, play guitar, box as an amateur, DJ, and powerlift. My final goal is to become a <u>jack of all trades</u>.</p>
-          <p>I'm always happy to talk to anyone, whether you're a student, researcher, or founder. Feel free to message me.</p>
-        </div>
-      </article>
-    </main>
-
-    <div class="about-photo">
-      <img src="images/john-portrait.jpg" alt="John Nguyen in sunglasses and a red backpack in front of a poster wall">
-    </div>
-
-    <nav class="side-links">
-      <a class="nav-link" href="news.html">Recent News &rarr;</a>
-      <a class="nav-link" href="experiences.html">Experiences &rarr;</a>
-      <a class="nav-link" href="skills.html">Life in My Eyes &rarr;</a>
-      <a class="nav-link" href="working-on.html">What I&rsquo;m Working On &rarr;</a>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="bar">
+    <nav class="bar-inner" aria-label="Main">
+      <a class="bar-name" href="index.html">John Nguyen</a>
+      <ul class="bar-links">
+        <li><a href="about.html" aria-current="page">About</a></li>
+        <li><a href="projects.html">Projects</a></li>
+        <li><a href="news.html">News</a></li>
+        <li><a href="experiences.html">Experience</a></li>
+      </ul>
     </nav>
-  </div>
+  </header>
 
-  <script>
-    // Live local time in Boston, whatever the visitor's own time zone is
-    (() => {
-      const clock = document.querySelector('.clock');
-      const format = new Intl.DateTimeFormat('en-US', {
-        timeZone: 'America/New_York',
-        hour: 'numeric',
-        minute: '2-digit',
-      });
-      const tick = () => { clock.textContent = format.format(new Date()); };
-      tick();
-      setInterval(tick, 15000);
-    })();
+  <main id="main" class="main-wide">
+    <h1 class="page-title reveal">About</h1>
+    <div class="about">
+      <div class="note">
+        <p class="reveal">I grew up in Washington, D.C., and now live in Boston, where I study biology with a minor in psychology at Northeastern University.</p>
+        <p class="reveal">I lead Skinapse AI Lab, a venture developing AI tools for skin health, and I am a scout at Boston Square Ventures. I have done research with Yale School of Medicine, Mayo Clinic School of Medicine, and Harvard Medical School, and I am interested in helping healthcare startups build and scale.</p>
+        <p class="reveal">Outside of work, I sing, play guitar, DJ, powerlift, and box as an amateur.</p>
+        <p class="reveal">I am always glad to hear from students, researchers, and founders. <a href="mailto:johnhnguyen2000@gmail.com">Send me an email.</a></p>
+      </div>
+      <img class="portrait reveal" src="images/john-portrait.webp" width="750" height="1000" alt="John Nguyen standing in front of a poster wall">
+    </div>
+  </main>
 
-    // Portrait is centered on the stretch from the "in Boston, Massachusetts"
-    // line to the end of the last paragraph, and a little taller than it
-    (() => {
-      const photo = document.querySelector('.about-photo');
-      const from = document.querySelector('.local-time');
-      const to = document.querySelector('.note-body p:last-child');
-      const stacked = window.matchMedia('(max-width: 700px)');
-      const EXTRA = 0.38;        // how much taller than the text stretch
-
-      function fit() {
-        photo.style.cssText = '';
-        if (stacked.matches) return;
-        const span = to.getBoundingClientRect().bottom - from.getBoundingClientRect().top;
-        const height = span * (1 + EXTRA);
-        photo.style.alignSelf = 'start';
-        photo.style.height = `${height}px`;
-        photo.style.width = `${height * 768 / 1024}px`;
-        const top = from.getBoundingClientRect().top - (height - span) / 2;
-        photo.style.marginTop = `${top - photo.getBoundingClientRect().top}px`;
-      }
-
-      new ResizeObserver(fit).observe(document.querySelector('.about-grid .page'));
-      stacked.addEventListener('change', fit);
-    })();
-  </script>
+  <footer class="footer">© 2026 John Nguyen</footer>
 </body>
 </html>

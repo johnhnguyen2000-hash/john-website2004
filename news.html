@@ -2,98 +2,83 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Recent News | John Nguyen</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>News · John Nguyen</title>
+  <meta name="description" content="Recent presentations, research, and partnerships.">
+  <meta name="theme-color" content="#FFFFFF">
+  <meta property="og:title" content="News · John Nguyen">
+  <meta property="og:description" content="Recent presentations, research, and partnerships.">
+  <meta property="og:image" content="https://jnguyen.net/images/john-portrait.webp">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
   <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="transitions.css">
-  <script src="transitions.js"></script>
-  <style>
-    /* News boxes use the same size and layout as the What I'm Working On
-       cards: photo on top, then date, title, and text. Two per row, centered. */
-    .news-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, min(100%, 500px));
-      justify-content: center;
-      gap: 1.25rem;
-    }
-
-    .news-card {
-      background: #fff;
-      border: 1px solid #e5e5e5;
-      overflow: hidden;
-    }
-
-    .news-card img {
-      display: block;
-      width: 100%;
-      height: auto;
-    }
-
-    .news-body {
-      padding: 1.25rem 1.5rem;
-    }
-
-    .news-label {
-      font-size: 0.75rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: #0f2d6b;
-      margin-bottom: 0.625rem;
-    }
-
-    .page .news-card h3 {
-      font-size: 1.625rem;
-      font-weight: 700;
-      line-height: 1.2;
-      margin-bottom: 1rem;
-    }
-
-    .page .news-card p:last-child {
-      margin-bottom: 0;
-    }
-  </style>
+  <script>document.documentElement.classList.add("js")</script>
+  <script src="script.js" defer></script>
 </head>
 <body>
-  <main class="page page-wide">
-    <a class="back" href="about.html" aria-label="Back to About Me">&larr;</a>
-    <h1>Recent News</h1>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="bar">
+    <nav class="bar-inner" aria-label="Main">
+      <a class="bar-name" href="index.html">John Nguyen</a>
+      <ul class="bar-links">
+        <li><a href="about.html">About</a></li>
+        <li><a href="projects.html">Projects</a></li>
+        <li><a href="news.html" aria-current="page">News</a></li>
+        <li><a href="experiences.html">Experience</a></li>
+      </ul>
+    </nav>
+  </header>
 
-    <div class="news-grid">
-      <article class="news-card">
-        <img src="images/intelli-schools.png" alt="Students at Intelli Schools watching a skin health presentation on a classroom screen">
-        <div class="news-body">
-          <p class="news-label">April 2026</p>
-          <h3>ADI, Skinapse Labs &amp; Intelli Schools</h3>
-          <p>This April, I formed a partnership between my nonprofit, ADI, my venture, Skinapse, and Intelli Schools in Visakhapatnam, India, to teach adolescent students about their skin health. Together we discussed the challenges specific to darker skin tones and how to address them, and we got to see firsthand how our image detection models performed on a new demographic.</p>
-        </div>
-      </article>
-
-      <article class="news-card">
-        <img src="images/mayo-crisp.jpeg" alt="John standing beside his research poster on solid organ transplantation outcomes">
-        <div class="news-body">
-          <p class="news-label">July 2026</p>
-          <h3>CRISP Intern at Mayo Clinic</h3>
-          <p>Presented a multi-site retrospective cohort analysis of survival, graft failure, and social determinants of health following solid organ transplantation.</p>
-        </div>
-      </article>
-
-      <article class="news-card">
-        <div class="news-body">
-          <p class="news-label">April 2026</p>
-          <h3>National Association of School Psychologists Presentation</h3>
-          <p>Adapting an NIH-funded mindfulness application for Asian American undergraduates.</p>
-        </div>
-      </article>
-
-      <article class="news-card">
-        <div class="news-body">
-          <p class="news-label">September 2026</p>
-          <h3>Using Spatial Proximity as a Discriminatory Factor for Acne-Identifying CNN Models</h3>
-          <p>Using the Clark&ndash;Evans test, Skinapse found that spatial clustering and lesion-to-lesion proximity can raise the confidence of CNN models trained on the ACNE04 dataset.</p>
-        </div>
-      </article>
-    </div>
+  <main id="main" class="main-wide">
+    <h1 class="page-title reveal">News</h1>
+    <ol class="timeline">
+      <li class="tl-item reveal">
+        <p class="tl-when"><span>September</span> 2026</p>
+        <article class="tl-card">
+          <div class="tl-text">
+            <p class="tl-tag">Research</p>
+            <h2>Spatial Proximity as a Discriminatory Factor for Acne-Identifying CNNs</h2>
+            <p>At Skinapse, we tested whether where acne lesions sit relative to one another can help a model classify them. Using the Clark–Evans test on the ACNE04 dataset, we found that spatial clustering and lesion-to-lesion proximity can raise the confidence of CNN models.</p>
+          </div>
+        </article>
+      </li>
+      <li class="tl-item has-img reveal">
+        <p class="tl-when"><span>July</span> 2026</p>
+        <article class="tl-card">
+          <div class="tl-text">
+            <p class="tl-tag">Internship</p>
+            <h2>CRISP Intern at Mayo Clinic</h2>
+            <p>I wrapped up my CRISP internship at Mayo Clinic by presenting a multi-site retrospective cohort analysis of survival, graft failure, and social determinants of health after solid organ transplantation.</p>
+          </div>
+          <img src="images/mayo-crisp.webp" width="1100" height="720" loading="lazy" alt="John standing beside his research poster on solid organ transplantation outcomes">
+        </article>
+      </li>
+      <li class="tl-item has-img reveal">
+        <p class="tl-when"><span>April</span> 2026</p>
+        <article class="tl-card">
+          <div class="tl-text">
+            <p class="tl-tag">Partnership</p>
+            <h2>ADI, Skinapse &amp; Intelli Schools</h2>
+            <p>My nonprofit, ADI, and my venture, Skinapse, partnered with Intelli Schools in Visakhapatnam, India, to teach adolescent students about their skin health. We talked through the challenges specific to darker skin tones, and I got to see firsthand how our image detection models performed on a new demographic.</p>
+          </div>
+          <img src="images/intelli-schools.webp" width="1100" height="720" loading="lazy" alt="Students at Intelli Schools watching a skin health presentation on a classroom screen">
+        </article>
+      </li>
+      <li class="tl-item reveal">
+        <p class="tl-when"><span>April</span> 2026</p>
+        <article class="tl-card">
+          <div class="tl-text">
+            <p class="tl-tag">Presentation</p>
+            <h2>National Association of School Psychologists</h2>
+            <p>I presented at the National Association of School Psychologists on adapting an NIH-funded mindfulness app for Asian American undergraduates.</p>
+          </div>
+        </article>
+      </li>
+    </ol>
   </main>
+
+  <footer class="footer">© 2026 John Nguyen</footer>
 </body>
 </html>
